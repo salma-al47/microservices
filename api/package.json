@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "Node, Express and Mongo backend",
   "main": "index.js",
+  "type": "module",
   "repository": "github:mannyhenri/node-mongo-docker",
   "scripts": {
-    "start": "nodemon ./index.js --exec babel-node -e js"
+    "start": "nodemon ./index.js"
   },
   "author": "Emmanuel Henri",
   "license": "ISC",
