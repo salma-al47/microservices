@@ -1,10 +1,12 @@
 pipeline {
     agent any
-    stages{
-        stage('Clone repository'){
-            git 'https://github.com/OuaritHajar/DeployMicrosrvAPP'
-        
-        }   
+    stages {
+        stage('Clone repository') {
+            steps {
+                git 'https://github.com/OuaritHajar/DeployMicrosrvAPP'
+            }
+        }
+
         stage('Build the images') {
             steps {
                 sh 'docker-compose build'
@@ -16,7 +18,7 @@ pipeline {
                     }
                 }
             }
-        }       
+        }
 
         stage('Test') {
             steps {
@@ -27,11 +29,11 @@ pipeline {
         stage('Deploy to ECR') {
             steps {
                 script {
-                    docker.withRegistry('public.ecr.aws/z8x8d4m6/repository', '202169348149') {
+                    docker.withRegistry('https://public.ecr.aws/z8x8d4m6/repository', 'ecr:us-east-1:202169348149') {
                         app.push("${env.BUILD_NUMBER}")
                     }
                 }
             }
-        } 
-    } 
-} 
+        }
+    }
+}
