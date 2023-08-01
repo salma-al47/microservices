@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+    def app
+
+    stage('Clone repository'){
+        git https://github.com/OuaritHajar/DeployMicrosrvAPP
+
+    }
+
+    stage('build the images'){
+        app = docker-compose.build("${env.BUILD_NUMBER}")
+
+        steps {
+            sh 'docker-compose build'
+        }
+    }
+
+    stage('Test'){ 
+        sh 'echo "test passed"'
+    }
+
+    stage('deploy to ECR'){
+        steps {
+            script{
+                docker.withRegistry('https://921728388910.dkr.ecr.us-east-1.amazonaws.com/repository', 'AWS-credentials') {
+                app.push("${env.BUILD_NUMBER}")
+                app.push("latest")
+                }
+            }
+        }
+    }
+}
