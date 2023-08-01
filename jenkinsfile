@@ -29,7 +29,7 @@ pipeline {
         stage('Deploy to ECR') {
             steps {
                 script {
-                    docker.withRegistry('https://public.ecr.aws/z8x8d4m6/repository', 'ecr:us-east-1:202169348149') {
+                    docker.withRegistry('https://057636725161.dkr.ecr.us-east-1.amazonaws.com/repository', 'aws-key') {
                         app.push("${env.BUILD_NUMBER}")
                     }
                 }
