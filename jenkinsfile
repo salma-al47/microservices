@@ -18,7 +18,6 @@
             steps {
                sh 'docker build -t app -f api/Dockerfile .'
                sh 'docker build -t client -f client/Dockerfile .'
-               sh 'docker build -t mongo'
             }
         }
 
@@ -26,7 +25,6 @@
             steps {
                 sh 'docker tag app 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:app'
                 sh 'docker tag client 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:client'
-                sh 'docker tag mongo 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:mongo'
             }
         }
        
@@ -34,8 +32,7 @@
             steps {
                 script {
                      sh 'docker push 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:app'
-                     sh 'docker push 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:client' 
-                     sh 'docker push 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:mongo'             
+                     sh 'docker push 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:client'             
                 }
             }
         }
