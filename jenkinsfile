@@ -45,7 +45,7 @@ pipeline {
                 script {
                    sh 'docker push 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:latest'
                         
-                    }
+                    
                 }
             }
         }
