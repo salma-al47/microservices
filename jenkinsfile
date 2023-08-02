@@ -19,9 +19,6 @@ pipeline {
                sh 'docker build 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:api'
                sh 'docker build 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:client'
             }
-            steps {
-                sh 'docker-compose build'
-            }
         }
 
         stage('Test') {
