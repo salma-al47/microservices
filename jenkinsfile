@@ -4,10 +4,14 @@ pipeline {
         stage('Clone repository') {
             steps {
                  script{
-                     git "https://github.com/OuaritHajar/DeployMicrosrvAPP"
-                        
-                    }
-                }
+                     git(
+                         url: "https://github.com/OuaritHajar/DeployMicrosrvAPP",
+                         branch: "main",
+                         changelog: true,
+                         poll: true
+                        )
+                 }
+            } 
         }
 
         stage('Build the images') {
