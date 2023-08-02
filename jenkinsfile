@@ -33,6 +33,14 @@ pipeline {
             }
         }
 
+        stage('Login to AWS Credentials') {
+            steps {
+                withCredentials([ [accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY',credentialsId: 'aws-key'] ]) {
+                    sh 'echo "AWS Access Key: $AWS_ACCESS_KEY_ID"'
+                    sh 'echo "AWS Secret Key: $AWS_SECRET_ACCESS_KEY"'
+                }
+            }
+        }
         stage('Deploy to ECR') {
             steps {
                 script {
