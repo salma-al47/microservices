@@ -16,22 +16,26 @@ pipeline {
 
         stage('Build the images') {
             steps {
-               sh 'docker build 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:api'
-               sh 'docker build 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:client'
+               sh 'docker build -t app'
+               sh 'docker build -t client'
+               sh 'docker build -t mongo'
             }
         }
 
-        stage('Test') {
+        stage('tag the images') {
             steps {
-                sh 'echo "test passed"'
+                sh 'docker tag app 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:app'
+                sh 'docker tag app 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:client'
+                sh 'docker tag app 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:mongo'
             }
         }
        
         stage('Push to ECR') {
             steps {
                 script {
-                   sh 'docker push 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:api'
-                   sh 'docker push 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:client'         
+                   sh 'docker push 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:app'
+                   sh 'docker push 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:client' 
+                    sh 'docker push 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:mongo'             
                 }
             }
         }
