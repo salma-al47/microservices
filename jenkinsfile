@@ -4,7 +4,7 @@ pipeline {
         stage('Clone repository') {
             steps {
                  script{
-                     git 'https://github.com/OuaritHajar/DeployMicrosrvAPP'
+                     git "https://github.com/OuaritHajar/DeployMicrosrvAPP"
                         
                     }
                 }
