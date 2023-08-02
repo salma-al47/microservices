@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     withAWS(credentials: 'aws-key', region:'${AWS_DEFAULT_REGION}') {
-                         sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com'
+                         sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin 011793885524.dkr.ecr.us-east-1.amazonaws.com"
                          sh 'docker push 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:app'
                          sh 'docker push 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:client'             
                     }
