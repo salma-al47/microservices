@@ -17,7 +17,7 @@
        stage('Build the images') {
             steps {
                sh 'docker build -t app -f api/Dockerfile .'
-               sh 'docker build -t client -f client/Dockerfile'
+               sh 'docker build -t client -f client/Dockerfile .'
                sh 'docker build -t mongo'
             }
         }
