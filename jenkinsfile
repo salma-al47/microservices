@@ -33,13 +33,7 @@ pipeline {
             }
         }
 
-        stage('Login to AWS Credentials') {
-            steps { withCredentials([ amazonWebServices(credentialsId: 'aws-key', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    sh 'echo "AWS Access Key: $AWS_ACCESS_KEY_ID"'
-                    sh 'echo "AWS Secret Key: $AWS_SECRET_ACCESS_KEY"'
-                }
-            }
-        }
+       
         stage('Push to ECR') {
             steps {
                 script {
