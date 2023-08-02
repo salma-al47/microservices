@@ -1,4 +1,4 @@
- pipeline {
+pipeline {
     agent any
     stages {
         stage('Clone repository') {
@@ -13,7 +13,6 @@
                  }
             } 
         }
-
        stage('Build the images') {
             steps {
                sh 'docker build -t app -f api/Dockerfile .'
@@ -27,14 +26,17 @@
                 sh 'docker tag client 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:client'
             }
         }
-       
         stage('Push to ECR') {
             steps {
                 script {
-                     sh 'docker push 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:app'
-                     sh 'docker push 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:client'             
+                    withAWS(credentials: 'aws-key', region:'${AWS_DEFAULT_REGION}') {
+                         sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com'
+                         sh 'docker push 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:app'
+                         sh 'docker push 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:client'             
+                    }
                 }
-            }
+           }
         }
+     
     }
 }
