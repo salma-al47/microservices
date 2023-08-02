@@ -16,14 +16,11 @@ pipeline {
 
         stage('Build the images') {
             steps {
-                sh 'docker-compose build'
+               sh 'docker build 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:api'
+               sh 'docker build 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:client'
             }
-            post {
-                success {
-                    script {
-                        app = docker.image("myapp:${env.BUILD_NUMBER}")
-                    }
-                }
+            steps {
+                sh 'docker-compose build'
             }
         }
 
@@ -32,14 +29,12 @@ pipeline {
                 sh 'echo "test passed"'
             }
         }
-
        
         stage('Push to ECR') {
             steps {
                 script {
-                   sh 'docker push 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:latest'
-                        
-                    
+                   sh 'docker push 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:api'
+                   sh 'docker push 501533612229.dkr.ecr.us-east-1.amazonaws.com/repository:client'         
                 }
             }
         }
