@@ -25,20 +25,32 @@ pipeline {
 
         stage('tag the images') {
             steps {
-                sh 'docker tag app 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:app'
-                sh 'docker tag client 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:client'
+                sh 'docker tag app 230188408900.dkr.ecr.us-east-1.amazonaws.com/repository:app'
+                sh 'docker tag client 230188408900.dkr.ecr.us-east-1.amazonaws.com/repository:client'
             }
         }
         stage('Push to ECR') {
             steps {
                 script {
                     withAWS(credentials: 'aws-key', region:'${AWS_DEFAULT_REGION}') {
-                         sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 011793885524.dkr.ecr.us-east-1.amazonaws.com"
-                         sh 'docker push 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:app'
-                         sh 'docker push 011793885524.dkr.ecr.us-east-1.amazonaws.com/repository:client'             
+                         sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 230188408900.dkr.ecr.us-east-1.amazonaws.com"
+                         sh 'docker push 230188408900.dkr.ecr.us-east-1.amazonaws.com/repository:app'
+                         sh 'docker push 230188408900.dkr.ecr.us-east-1.amazonaws.com/repository:client'             
                     }
                 }
            }
+        }
+        stage('Deploy with docker compose'){
+            steps {
+                script {
+                    sshagent(credentials: ['aws-private-key']) {
+                        sh 'ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY_PATH ubuntu@ec2-3-86-84-226.compute-1.amazonaws.com "mkdir /var/www/deploy"'
+                        sh 'scp -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY_PATH docker-compose.yml ubuntu@ec2-3-86-84-226.compute-1.amazonaws.com:/var/www/deploy/'
+                        sh 'ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY_PATH ubuntu@ec2-3-86-84-226.compute-1.amazonaws.com "cd /var/www/deploy && docker-compose up -d"'                    
+                    
+                    }
+                }
+            }
         }
      
     }
