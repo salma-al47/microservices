@@ -42,15 +42,13 @@ pipeline {
         }
         stage('Deploy with docker compose'){
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'aws-private-key', keyFileVariable: 'SSH_PRIVATE_KEY_PATH')]) {
-                script {
-                   def EC2_INSTANCE_IP = 'ec2-3-94-85-197.compute-1.amazonaws.com'
-                   sh "ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY_PATH ubuntu@${EC2_INSTANCE_IP} 'mkdir -p /var/www/deploy'"
-                   sh "scp -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY_PATH docker-compose.yml ubuntu@${EC2_INSTANCE_IP}:/var/www/deploy/"
-                   sh "ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY_PATH ubuntu@${EC2_INSTANCE_IP} 'cd /var/www/deploy && docker-compose up -d'"
-                  }
+                sshagent(credentials: ['aws-private-key']) {
+                    def EC2_INSTANCE_IP = 'ec2-3-94-85-197.compute-1.amazonaws.com'
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'mkdir -p /var/www/deploy'"
+                    sh "scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${EC2_INSTANCE_IP}:/var/www/deploy/"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'cd /var/www/deploy && docker-compose up -d'"
+                  }   
                }
            }
-       }
     }
 }
