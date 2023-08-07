@@ -43,7 +43,7 @@ pipeline {
         stage('Deploy with docker compose'){
             steps {
                 script {
-                   sshagent(credentials: ['aws-private-key']) {
+                   sshagent(credentials: ['aws-key']) {
                     def EC2_INSTANCE_IP = 'ec2-3-94-85-197.compute-1.amazonaws.com'
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'mkdir -p ~/deploy'"
                     sh "scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${EC2_INSTANCE_IP}:~/deploy/"
