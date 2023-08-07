@@ -47,10 +47,14 @@ pipeline {
                     def EC2_INSTANCE_IP = 'ec2-3-94-85-197.compute-1.amazonaws.com'
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'mkdir -p ~/deploy'"
                     sh "scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${EC2_INSTANCE_IP}:~/deploy/"
+                    def dockerPassword = sh(
+                       script: "aws ecr get-login-password --region us-east-1",
+                       returnStdout: true
+                       ).trim()
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'cd ~/deploy && \
-                        export AWS_DEFAULT_REGION=us-east-1 && \
-                        \$(aws ecr get-login-password --region \$AWS_DEFAULT_REGION | docker login --username AWS --password-stdin 175817389458.dkr.ecr.us-east-1.amazonaws.com) && \
-                        docker-compose up -d'"
+                       echo \"${dockerPassword}\" | docker login --username AWS --password-stdin 175817389458.dkr.ecr.us-east-1.amazonaws.com && \
+                       docker-compose up -d'"
+                    
                     }
                 }
             }    
