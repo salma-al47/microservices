@@ -48,8 +48,8 @@ pipeline {
                         sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'mkdir -p ~/deploy'"
                         sh "scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${EC2_INSTANCE_IP}:~/deploy/"
                         sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'cd ~/deploy && \
-                          aws ecr get-login-password --region us-east-1 | docker login -u AWS --password-stdin && \
-                          docker-compose up -d'"
+                           docker-compose up -d'"
+
                    }
                 }
             }    
