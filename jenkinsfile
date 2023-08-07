@@ -42,20 +42,15 @@ pipeline {
         }
         stage('Deploy with docker compose'){
             steps {
-                script {
-                   sshagent(credentials: ['aws-key']) {
+                 script {
+                    sshagent(credentials: ['aws-private-key']) {
                     def EC2_INSTANCE_IP = 'ec2-3-94-85-197.compute-1.amazonaws.com'
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'mkdir -p ~/deploy'"
                     sh "scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${EC2_INSTANCE_IP}:~/deploy/"
-                    def dockerPassword = sh(
-                       script: "aws ecr get-login-password --region us-east-1",
-                       returnStdout: true
-                       ).trim()
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'cd ~/deploy && \
-                       echo \"${dockerPassword}\" | docker login --username AWS --password-stdin 175817389458.dkr.ecr.us-east-1.amazonaws.com && \
-                       docker-compose up -d'"
-                    
-                    }
+                      docker login -u AWS -p \$(aws ecr get-login-password --region us-east-1) && \
+                      docker-compose up -d'"
+                   }
                 }
             }    
            
