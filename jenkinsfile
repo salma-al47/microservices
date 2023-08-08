@@ -25,18 +25,17 @@ pipeline {
 
         stage('tag the images') {
             steps {
-                sh 'docker tag app 175817389458.dkr.ecr.us-east-1.amazonaws.com/repository:app'
-                sh 'docker tag client 175817389458.dkr.ecr.us-east-1.amazonaws.com/repository:client'
+                sh 'docker tag app 363379993588.dkr.ecr.us-east-1.amazonaws.com/repository:app'
+                sh 'docker tag client 363379993588.dkr.ecr.us-east-1.amazonaws.com/repository:client'
             }
         }
         stage('Push to ECR') {
             steps {
                 script {
                     withAWS(credentials: 'aws-key', region:'${AWS_DEFAULT_REGION}') {
-                         sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 175817389458.dkr.ecr.us-east-1.amazonaws.com"
-                         sh 'docker push 175817389458.dkr.ecr.us-east-1.amazonaws.com/repository:app'
-                         sh 'docker push 175817389458.dkr.ecr.us-east-1.amazonaws.com/repository:client'             
-                    }
+                         sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 363379993588.dkr.ecr.us-east-1.amazonaws.com"
+                         sh 'docker push 363379993588.dkr.ecr.us-east-1.amazonaws.com/repository:app'
+                         sh 'docker push 363379993588.dkr.ecr.us-east-1.amazonaws.com/repository:client'
                 }
            }
         }
@@ -44,7 +43,7 @@ pipeline {
             steps {
                  script {
                     sshagent(credentials: ['aws-private-key']) {
-                        def EC2_INSTANCE_IP = 'ec2-3-94-85-197.compute-1.amazonaws.com'
+                        def EC2_INSTANCE_IP = 'ec2-54-205-62-118.compute-1.amazonaws.com'
                         sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'mkdir -p ~/deploy'"
                         sh "scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${EC2_INSTANCE_IP}:~/deploy/"
                         sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'cd ~/deploy && \
