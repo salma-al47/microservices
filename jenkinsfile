@@ -36,8 +36,9 @@ pipeline {
                          sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 363379993588.dkr.ecr.us-east-1.amazonaws.com"
                          sh 'docker push 363379993588.dkr.ecr.us-east-1.amazonaws.com/repository:app'
                          sh 'docker push 363379993588.dkr.ecr.us-east-1.amazonaws.com/repository:client'
+                    }
                 }
-           }
+            }
         }
         stage('Deploy with docker compose'){
             steps {
@@ -51,9 +52,8 @@ pipeline {
 
                    }
                 }
-            }    
-           
+            }       
         }
     }
-}
-}
+ 
+ }
