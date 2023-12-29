@@ -1,59 +1,44 @@
 pipeline {
     agent any
+   
     environment {
-        AWS_DEFAULT_REGION = 'us-east-1' 
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+        DOCKER_COMPOSE_FILE = 'docker-compose.yml'
     }
-    stages {
-        stage('Clone repository') {
-            steps {
-                 script{
-                     git(
-                         url: "https://github.com/OuaritHajar/DeployMicrosrvAPP",
-                         branch: "main",
-                         changelog: true,
-                         poll: true
-                        )
-                 }
-            } 
-        }
-       stage('Build the images') {
-            steps {
-               sh 'docker build -t app -f api/Dockerfile .'
-               sh 'docker build -t client -f client/Dockerfile .'
-            }
-        }
 
-        stage('tag the images') {
-            steps {
-                sh 'docker tag app 363379993588.dkr.ecr.us-east-1.amazonaws.com/repository:app'
-                sh 'docker tag client 363379993588.dkr.ecr.us-east-1.amazonaws.com/repository:client'
-            }
-        }
-        stage('Push to ECR') {
+    stages {
+        stage('Checkout Code') {
             steps {
                 script {
-                    withAWS(credentials: 'aws-key', region:'${AWS_DEFAULT_REGION}') {
-                         sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 363379993588.dkr.ecr.us-east-1.amazonaws.com"
-                         sh 'docker push 363379993588.dkr.ecr.us-east-1.amazonaws.com/repository:app'
-                         sh 'docker push 363379993588.dkr.ecr.us-east-1.amazonaws.com/repository:client'
+                    // Checkout de votre dépôt GitHub
+                    checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/salma-al47/deploy-micro.git']]])
+                }
+            }
+        }
+        stage('Build Images') {
+            steps {
+                script {
+                    checkout scm
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        // Build all images
+                        sh "docker-compose -f $DOCKER_COMPOSE_FILE build"
                     }
                 }
             }
         }
-        stage('Deploy with docker compose'){
-            steps {
-                 script {
-                    sshagent(credentials: ['aws-private-key']) {
-                        def EC2_INSTANCE_IP = 'ec2-54-205-62-118.compute-1.amazonaws.com'
-                        sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'mkdir -p ~/deploy'"
-                        sh "scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${EC2_INSTANCE_IP}:~/deploy/"
-                        sh "ssh -o StrictHostKeyChecking=no ubuntu@${EC2_INSTANCE_IP} 'cd ~/deploy && \
-                           docker-compose up -d'"
 
-                   }
+        stage('Push Images to DockerHub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        // Log in to DockerHub
+                        sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
+
+                        // Push all images to DockerHub
+                        sh "docker-compose -f $DOCKER_COMPOSE_FILE push"
+                    }
                 }
-            }       
+            }
         }
     }
- 
- }
+}
